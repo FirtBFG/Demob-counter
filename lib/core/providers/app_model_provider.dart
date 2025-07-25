@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider_app1/core/repositories/abstr/sh_prefs_repository.dart';
 
 class AppModel extends ChangeNotifier {
-  AppModel(this.prefs);
+  AppModel(this.shPrefRepository);
   //дата начала
   DateTime _startDate = DateTime.now();
   DateTime get startDate => _startDate;
@@ -27,16 +27,17 @@ class AppModel extends ChangeNotifier {
   double get leftGradientValue =>
       1 - (finalDate.difference(currentDate).inDays + 1) / 365;
 
-  final SharedPreferences prefs;
+  final ShPrefRepository shPrefRepository;
 
   void initModel() async {
     _initData();
     _startMidnightTimer();
   }
 
-  void _initData() {
-    _startDate = DateTime.tryParse(prefs.getString('start_date') ?? '') ??
-        DateTime.now();
+  void _initData() async {
+    _startDate =
+        DateTime.tryParse(await shPrefRepository.getString('start_date')) ??
+            DateTime.now();
     notifyListeners();
   }
 
@@ -61,7 +62,7 @@ class AppModel extends ChangeNotifier {
         ) ??
         _startDate;
     _startDate = newStartDate;
-    prefs.setString('start_date', _startDate.toString());
+    shPrefRepository.setString('start_date', _startDate.toString());
     print(_startDate.toString());
     notifyListeners();
   }
