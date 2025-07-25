@@ -41,16 +41,6 @@ class _AllImagesScreenState extends State<AllImagesScreen> {
     return confirm;
   }
 
-  // @override
-  // void dispose() {
-  //   final imageProvider = Provider.of<ImagesProvider>(context, listen: false);
-  //   for (int index in imageProvider.selectedImages) {
-  //     imageProvider.images[index].isSelected = false;
-  //   }
-  //   imageProvider.clearSelectedImages();
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
     final imageProvider = Provider.of<ImagesProvider>(context, listen: true);

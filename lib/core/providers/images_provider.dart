@@ -4,12 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider_app1/core/models/my_image.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider_app1/core/repositories/abstr/sh_prefs_repository.dart';
 
 class ImagesProvider extends ChangeNotifier {
-  final SharedPreferences? prefs;
+  final ShPrefRepository? shPrefRepository;
 
-  ImagesProvider(this.prefs);
+  ImagesProvider(this.shPrefRepository);
 
   List<MyImage> images = [];
   List<String> _imagesPaths = [];
@@ -18,8 +18,8 @@ class ImagesProvider extends ChangeNotifier {
 
   File? get currentImage => images.isEmpty ? null : images[_imageIndex].file;
 
-  void initData() {
-    _imagesPaths = prefs!.getStringList('images_list') ?? [];
+  void initData() async {
+    _imagesPaths = await shPrefRepository!.getStringList('images_list') ?? [];
     for (var element in _imagesPaths) {
       images.add(MyImage(file: File(element)));
     }
@@ -48,7 +48,7 @@ class ImagesProvider extends ChangeNotifier {
         _imagesPaths.add(newImages[i].path);
         images.add(MyImage(file: File(newImages[i].path)));
       }
-      prefs!.setStringList('images_list', _imagesPaths);
+      shPrefRepository!.setStringList('images_list', _imagesPaths);
     }
   }
 
@@ -58,8 +58,8 @@ class ImagesProvider extends ChangeNotifier {
       images.removeAt(index);
       _imagesPaths.removeAt(index);
     }
-    prefs!.remove('images_list');
-    prefs!.setStringList('images_list', _imagesPaths);
+    shPrefRepository!.remove('images_list');
+    shPrefRepository!.setStringList('images_list', _imagesPaths);
     _imageIndex = 0;
     notifyListeners();
   }
