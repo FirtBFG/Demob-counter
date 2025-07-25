@@ -12,14 +12,13 @@ class AllImagesScreen extends StatefulWidget {
 }
 
 class _AllImagesScreenState extends State<AllImagesScreen> {
-  void selectImage(ImagesProvider imageProvider, int index) {
+  List<int> selectedImages = [];
+  void selectImage(List<int> selectedImages, int index) {
     return setState(() {
-      imageProvider.images[index].isSelected =
-          !imageProvider.images[index].isSelected;
-      if (imageProvider.images[index].isSelected) {
-        imageProvider.selectedImages.add(index);
+      if (selectedImages.contains(index)) {
+        selectedImages.remove(index);
       } else {
-        imageProvider.selectedImages.remove(index);
+        selectedImages.add(index);
       }
     });
   }
@@ -42,6 +41,16 @@ class _AllImagesScreenState extends State<AllImagesScreen> {
     return confirm;
   }
 
+  // @override
+  // void dispose() {
+  //   final imageProvider = Provider.of<ImagesProvider>(context, listen: false);
+  //   for (int index in imageProvider.selectedImages) {
+  //     imageProvider.images[index].isSelected = false;
+  //   }
+  //   imageProvider.clearSelectedImages();
+  //   super.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
     final imageProvider = Provider.of<ImagesProvider>(context, listen: true);
@@ -59,12 +68,12 @@ class _AllImagesScreenState extends State<AllImagesScreen> {
                 Positioned(
                   bottom: 10,
                   right: 10,
-                  child: CheckCircle(
-                      isSelected: imageProvider.images[index].isSelected),
+                  child:
+                      CheckCircle(isSelected: selectedImages.contains(index)),
                 ),
               ],
             ),
-            onTap: () => selectImage(imageProvider, index),
+            onTap: () => selectImage(selectedImages, index),
           );
         },
         gridDelegate:
@@ -77,7 +86,8 @@ class _AllImagesScreenState extends State<AllImagesScreen> {
           onPressed: () async {
             bool accept = await _showAcceptDialog();
             if (accept) {
-              imageProvider.deleteImages(imageProvider.images);
+              imageProvider.deleteImages(selectedImages);
+              selectedImages = [];
             }
           },
           child: Icon(Icons.delete),

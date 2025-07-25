@@ -13,12 +13,10 @@ class ImagesProvider extends ChangeNotifier {
 
   List<MyImage> images = [];
   List<String> _imagesPaths = [];
-  List<int> _selectedImages = [];
   int _imageIndex = 0;
   Timer? _changeImageTimer;
 
   File? get currentImage => images.isEmpty ? null : images[_imageIndex].file;
-  List<int> get selectedImages => _selectedImages;
 
   void initData() {
     _imagesPaths = prefs!.getStringList('images_list') ?? [];
@@ -47,22 +45,19 @@ class ImagesProvider extends ChangeNotifier {
     final newImages = await picker.pickMultiImage();
     if (newImages.isNotEmpty) {
       for (int i = 0; i < newImages.length; i++) {
-        //if (!images.contains(newImages[i].path)) {
         _imagesPaths.add(newImages[i].path);
         images.add(MyImage(file: File(newImages[i].path)));
-        //}
       }
       prefs!.setStringList('images_list', _imagesPaths);
     }
   }
 
-  void deleteImages(List<MyImage> images) {
-    _selectedImages.sort((a, b) => b - a);
-    for (int index in _selectedImages) {
+  void deleteImages(List<int> selectedImages) {
+    selectedImages.sort((a, b) => b - a);
+    for (int index in selectedImages) {
       images.removeAt(index);
       _imagesPaths.removeAt(index);
     }
-    _selectedImages = [];
     prefs!.remove('images_list');
     prefs!.setStringList('images_list', _imagesPaths);
     _imageIndex = 0;
